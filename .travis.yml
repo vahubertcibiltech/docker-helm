@@ -1,0 +1,18 @@
+dist: trusty
+
+cron:
+  - branch: master
+    interval: monthly
+    options: always run
+
+jobs:
+  include:
+    - stage: build docker image
+      script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker build -t cibiltech/helm .
+      - docker tag cibiltech/helm cibiltech/helm:latest
+      - docker push cibiltech/helm
+    - stage: test
+      script: docker run --rm cibiltech/helm help
+    - script: docker run --rm cibiltech/helm help
